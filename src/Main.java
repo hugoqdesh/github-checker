@@ -12,24 +12,67 @@ public class Main {
         try {
             Scanner s = new Scanner(System.in);
 
-            System.out.println("=== GITHUB ACTIVITY CHECKER ===\n");
+            System.out.println("=== GITHUB PROFILE CHECKER ===\n");
 
             System.out.print("Enter github username: ");
             String username = s.nextLine().trim();
 
-            System.out.println("\n" + username + "'s recent activity:\n");
+            String profile = fetchProfile(username);
 
-            String responseBody = fetchEvents(username);
+            printUser(profile);
 
-            if (responseBody == null) {
-                System.out.println("Failed to fetch data from GitHub");
-                return;
+            System.out.print("\nDo you want to view recent activity? (y/n): ");
+            String choice = s.nextLine().trim().toLowerCase();
+
+            if(choice.equals("y") || choice.equals("yes")) {
+                String response = fetchEvents(username);
+
+                printActivity(response);
+            } else {
+                System.out.println("\nCya...");
             }
-
-            printActivity(responseBody);
         } catch (Exception e) {
             System.out.println("Unexpected error: " + e.getMessage());
         }
+    }
+
+    private static String fetchProfile(String username) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI("https://api.github.com/users/" + username))
+                    .GET()
+                    .build();
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return response.body();
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            System.out.println("Error fetching user profile: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static void printUser(String json) {
+        JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
+
+        String username = obj.has("login") && !obj.get("login").isJsonNull() ? obj.get("login").getAsString() : "N/A";
+        String name = obj.has("name") && !obj.get("name").isJsonNull() ? obj.get("name").getAsString() : "N/A";
+        String bio = obj.has("bio") && !obj.get("bio").isJsonNull() ? obj.get("bio").getAsString() : "N/A";
+        String website = obj.has("blog") && !obj.get("blog").isJsonNull() ? obj.get("blog").getAsString() : "N/A";
+        String location = obj.has("location") && !obj.get("location").isJsonNull() ? obj.get("location").getAsString() : "N/A";
+        int publicRepos = obj.has("public_repos") ? obj.get("public_repos").getAsInt() : 0;
+        int followers = obj.has("followers") ? obj.get("followers").getAsInt() : 0;
+        int following = obj.has("following") ? obj.get("following").getAsInt() : 0;
+
+        System.out.println("Username:       " + username);
+        System.out.println("Name:           " + name);
+        System.out.println("Bio:            " + bio);
+        System.out.println("Website:        " + website);
+        System.out.println("Location:       " + location);
+        System.out.println("Public Repos:   " + publicRepos);
+        System.out.println("Followers:      " + followers);
+        System.out.println("Following:      " + following);
     }
 
     private static String fetchEvents(String username) {
@@ -40,7 +83,6 @@ public class Main {
                     .build();
 
             HttpClient client = HttpClient.newHttpClient();
-
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             return response.body();
