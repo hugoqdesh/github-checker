@@ -1,4 +1,3 @@
-<br />
 <h3 align="center">GitHub Checker</h3>
 <p align="center">A simple Java console application that retrieves and displays GitHub user information and recent activity using GitHub’s REST API</p>
 
