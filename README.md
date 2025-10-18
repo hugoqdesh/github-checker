@@ -1,15 +1,11 @@
 <h3 align="center">GitHub Checker</h3>
-<p align="center">A simple Java console application that retrieves and displays GitHub user information and recent activity using GitHub’s REST API</p>
+<p align="center">Displays Github user information with recent activity</p>
 
 ## About The Project
-
-This Java application allows you to:
 
 - Fetch and display a GitHub user's profile details (username, name, bio, location, etc.)
 - View their recent GitHub activity (last 6 public events)
 - Interact via a terminal-based UI
-
-It uses Java’s built-in HTTP Client and Google's Gson for parsing JSON responses from the GitHub API.
 
 ## Example
 
